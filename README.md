@@ -1,4 +1,5 @@
 # Sales Intelligence, Forecasting & Customer Profitability Optimization Platform
+**Live interactive dashboard: [nasaamit005.github.io/sales-intelligence-forecasting-customer-profitability](https://nasaamit005.github.io/sales-intelligence-forecasting-customer-profitability/)**
 
 An end-to-end business analytics application: **data -> SQL -> analytics -> machine learning -> business
 recommendations -> interactive dashboard -> automated reporting**, built on the Global Superstore sample
