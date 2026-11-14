@@ -129,7 +129,7 @@ every table has a filtered CSV export; Plotly charts export PNG; empty-filter an
 Charts are served from a local `plotly.min.js` (no CDN needed). Screenshots: `docs/screenshots/`.
 The forecasting page is not filterable (forecasts are at total level).
 **Two versions of the dashboard:**
-- **Live static version** (`docs/index.html`, hosted on GitHub Pages): 7 tabs, with Year / Market / Category filters. It is rebuilt from the pipeline results by `scripts/build_static_dashboard.py` and loads Chart.js from a CDN, so it needs an internet connection.
+- **Live static version** (`index.html`, hosted on GitHub Pages): 7 tabs, with Year / Market / Category filters. It is rebuilt from the pipeline results by `scripts/build_static_dashboard.py` and loads Chart.js from a CDN, so it needs an internet connection.
 - **Flask version** (`python app.py`): 9 pages, with CSV export and a local Plotly bundle, so it works offline.
 
 ## 7. Reports
