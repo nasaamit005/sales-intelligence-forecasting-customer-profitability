@@ -8,3 +8,5 @@ logs/
 models/*.bin
 
 .ruff_cache/
+
+.ruff_cache/
