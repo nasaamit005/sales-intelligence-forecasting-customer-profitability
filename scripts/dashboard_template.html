@@ -1,0 +1,164 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sales Intelligence Dashboard: Forecasting &amp; Customer Profitability</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#F4F6FA;--card:#fff;--text:#1c2530;--muted:#5F6B7A;--line:#E3E8EF;--navy:#1F3864;--acc:#2E75B6;--pos:#2E8B57;--neg:#C0392B;--warn:#FFF6DC;--info:#E8F1FB;--hl:#EAF2FB;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10151C;--card:#18202B;--text:#E6EBF2;--muted:#9AA7B8;--line:#2A3544;--navy:#9CC3F0;--acc:#5AA0E0;--pos:#4CC38A;--neg:#F0776B;--warn:#3A3220;--info:#1B2B40;--hl:#1F3047;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10151C;--card:#18202B;--text:#E6EBF2;--muted:#9AA7B8;--line:#2A3544;--navy:#9CC3F0;--acc:#5AA0E0;--pos:#4CC38A;--neg:#F0776B;--warn:#3A3220;--info:#1B2B40;--hl:#1F3047;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Calibri,Arial,sans-serif;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--card)}
+header{padding:18px 22px 8px}h1{margin:0;font-size:22px;color:var(--navy)}.sub{color:var(--muted);font-size:13px;margin-top:4px}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--card);border-bottom:1px solid var(--line);display:flex;gap:2px;overflow-x:auto;padding:0 14px}
+nav button{background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:11px 13px;font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+nav button.on{color:var(--navy);border-bottom-color:#F28E2B;font-weight:600}nav .sp{flex:1}
+main{padding:16px 22px 40px;max-width:1280px;margin:0 auto}
+.filters{display:flex;flex-wrap:wrap;gap:12px;align-items:end;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:14px}
+.filters label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+select,.btn{font:inherit;font-size:13px;padding:6px 9px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--text)}.btn{cursor:pointer}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--acc);border-radius:8px;padding:10px 12px}.kpi span{font-size:12px;color:var(--muted)}.kpi b{display:block;font-size:21px;color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0}.card.w{grid-column:1/-1}
+h2{font-size:15px;margin:0 0 8px;color:var(--navy)}.cv{position:relative;height:300px}.cv.t{height:420px}
+.note{padding:9px 12px;border-radius:6px;background:var(--info);border-left:4px solid var(--acc);font-size:13px;margin:0 0 12px}.note.warn{background:var(--warn);border-left-color:#F9A825}
+.sc{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:12.5px}th{background:var(--hl);color:var(--navy);text-align:left;padding:6px 8px;white-space:nowrap}
+td{padding:5px 8px;border-bottom:1px solid var(--line);white-space:nowrap}tr.hl td{background:var(--hl);font-weight:600}td.n{text-align:right}
+.pos{color:var(--pos)}.neg{color:var(--neg)}ul.l{margin:0;padding-left:18px}ul.l li{margin:6px 0}.sec{display:none}.sec.on{display:block}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}.kv div{background:var(--hl);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--muted)}.kv b{display:block;font-size:18px;color:var(--navy)}
+footer{color:var(--muted);font-size:12px;padding:0 22px 24px;max-width:1280px;margin:0 auto}
+header{background:linear-gradient(135deg,#1F3864 0%,#2E75B6 100%);padding:20px 24px 16px}header h1{color:#fff;font-size:24px;letter-spacing:.2px}header .sub{color:#DCE8F7}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.badges span{background:rgba(255,255,255,.16);color:#fff;border-radius:999px;padding:3px 11px;font-size:12px}
+.card{box-shadow:0 1px 3px rgba(16,24,40,.07)}.kpi{box-shadow:0 1px 3px rgba(16,24,40,.07)}.kpi b{font-size:22px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}.chip{background:var(--hl);color:var(--navy);border:1px solid var(--acc);border-radius:999px;padding:3px 11px;font-size:12.5px;cursor:pointer}.chip:hover{background:var(--acc);color:#fff}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}.seg button{border:0;background:var(--card);color:var(--muted);padding:6px 11px;font:inherit;font-size:12.5px;cursor:pointer}.seg button.on{background:var(--acc);color:#fff}
+.delta{font-style:normal;font-size:12px;font-weight:600;margin-left:8px}.ins{border-left-color:#F28E2B}.ins ul{margin:4px 0 0;padding-left:18px}.ins li{margin:3px 0}
+th{cursor:pointer;user-select:none}th:hover{text-decoration:underline}.tools{text-align:right;margin-bottom:5px}.tools .btn{font-size:12px;padding:3px 9px}
+</style></head><body>
+<header><h1>Sales Intelligence, Forecasting &amp; Customer Profitability</h1>
+<div class="sub">Global Superstore sample data (fictional), Jan 2011 to Dec 2014. Revenue = sales; profit = the source’s reported profit field. All figures come from the analytics pipeline.</div><div class="badges"><span>51,290 order lines</span><span>7 markets · 147 countries</span><span>1,590 customers</span><span>7 forecasting models</span><span>Click charts to drill down</span></div></header>
+<nav id="tabs"><button data-t="ov" class="on">Overview</button><button data-t="sa">Sales &amp; Seasonality</button><button data-t="pr">Products &amp; Profit</button><button data-t="di">Discounts</button><button data-t="cu">Customers</button><button data-t="fc">Forecast &amp; Planning</button><button data-t="in">Insights &amp; Method</button><span class="sp"></span><button id="theme" title="Toggle light/dark">◐ Theme</button></nav>
+<main>
+<div class="filters" id="filters"><label>Year<select id="fy"></select></label><label>Market<select id="fm"></select></label><label>Category<select id="fc"></select></label><label id="mtl">Metric (Overview)<div class="seg" id="mt"></div></label><button class="btn" id="reset">Reset all</button><span class="sub" id="fnote">Filters apply to Overview, Sales, Products and Discounts.</span></div>
+<div id="chips" class="chips"></div><div id="ins" class="note ins"></div><div id="kp" class="kpis"></div>
+<section class="sec on" id="s_ov"><div class="grid"><div class="card w"><h2 id="h_mon">Monthly revenue</h2><div class="cv"><canvas id="c_mon"></canvas></div></div>
+<div class="card"><h2 id="h_cat">By category</h2><div class="cv"><canvas id="c_cat"></canvas></div></div><div class="card"><h2 id="h_mkt">By market</h2><div class="cv"><canvas id="c_mkt"></canvas></div></div>
+<div class="card"><h2>Reported margin by market (click a bar to filter)</h2><div class="cv"><canvas id="c_mm"></canvas></div></div>
+<div class="card"><h2>Whole-dataset context (not filtered)</h2><div class="kv" id="ctx"></div></div></div></section>
+<section class="sec" id="s_sa"><div class="grid"><div class="card w"><h2>Seasonality: monthly revenue index by year (1.0 = that year’s monthly average)</h2><div class="cv"><canvas id="c_sea"></canvas></div></div>
+<div class="card w"><h2>Revenue by market and year, with growth</h2><div class="sc" id="t_yoy"></div></div></div></section>
+<section class="sec" id="s_pr"><div class="grid"><div class="card w"><h2>Reported profit by sub-category</h2><div class="cv t"><canvas id="c_sub"></canvas></div></div>
+<div class="card w"><h2>Opportunity matrix: revenue growth vs. reported margin</h2><div class="note" id="oppn"></div><div class="cv t"><canvas id="c_opp"></canvas></div></div>
+<div class="card w"><h2>Sub-category summary</h2><div class="sc" id="t_sub"></div></div><div class="card w"><h2>High-revenue products with under 2% margin (whole dataset)</h2><div class="sc" id="t_weak"></div></div></div></section>
+<section class="sec" id="s_di"><div class="note warn">These are descriptive associations. Discounts are not randomly assigned, so nothing here proves that a discount caused a margin change.</div>
+<div class="grid"><div class="card"><h2>Reported margin by discount band</h2><div class="cv"><canvas id="c_dm"></canvas></div></div><div class="card"><h2>Revenue and profit by discount band</h2><div class="cv"><canvas id="c_dr"></canvas></div></div>
+<div class="card w"><h2>Discount band table</h2><div class="sc" id="t_dis"></div></div></div></section>
+<section class="sec" id="s_cu"><div class="note">Customer views use the whole dataset (filters do not apply). Customer value is historical revenue and profit to date, not a forecast lifetime value.</div>
+<div class="grid"><div class="card"><h2>Revenue share by RFM segment</h2><div class="cv"><canvas id="c_seg"></canvas></div></div><div class="card"><h2>Segment profile</h2><div class="sc" id="t_seg"></div></div>
+<div class="card w"><h2>Quarterly cohort retention (share of each first-purchase cohort buying again N quarters later)</h2><div class="sc" id="t_coh"></div></div>
+<div class="card"><h2>Highest-value customers (historical)</h2><div class="sc" id="t_top"></div></div><div class="card"><h2>Churn model (180-day lapse, time-split test)</h2><div class="kv" id="churn"></div></div></div></section>
+<section class="sec" id="s_fc"><div class="filters"><label>Show held-out test forecast for<select id="fmodel"></select></label><span class="sub">Compare any model with actuals. Click legend items to hide or show lines.</span></div><div class="note" id="fcn"></div><div class="grid"><div class="card w"><h2>Weekly revenue: actual, held-out test forecast and next-13-week forecast</h2><div class="cv t"><canvas id="c_fc"></canvas></div></div>
+<div class="card w"><h2>Model comparison (3 rolling-origin validation folds; selection used validation only)</h2><div class="sc" id="t_sel"></div></div>
+<div class="card"><h2>Accuracy by category (same protocol)</h2><div class="sc" id="t_cat"></div></div><div class="card"><h2>Demand scenarios (units inferred from trailing 52-week units per revenue dollar)</h2><div class="sc" id="t_hz"></div><div class="note warn" style="margin-top:10px">No inventory, lead-time or supplier data exists, so reorder points and safety stock are not calculated.</div></div></div></section>
+<section class="sec" id="s_in"><div class="grid"><div class="card"><h2>Key findings</h2><ul class="l" id="finds"></ul></div><div class="card"><h2>Recommended actions</h2><ul class="l" id="recs"></ul></div>
+<div class="card w"><h2>Method and limitations</h2><ul class="l"><li><b>Data:</b> fictional Global Superstore sample (51,290 order lines). Dates are day-first in two formats; 659 order IDs are reused, so an order = order ID + date + customer.</li>
+<li><b>Profit</b> is the source’s reported field, not audited net profit; shipping cost is not subtracted.</li><li><b>Forecasting:</b> 208 complete weeks; 7 models; 3 expanding-window validation folds choose the model; the last 13 weeks (Oct–Dec 2014) are held out. The held-out block was seen during development, so treat its scores as indicative. On it, simple baselines scored about 15% WAPE versus 18% for the selected model.</li>
+<li><b>Bug found and fixed:</b> an earlier level-based XGBoost forecast came out at 1.70x last year’s Q1; the year-over-year-ratio model and a plausibility test replaced it.</li><li><b>Intervals</b> are empirical (10th–90th percentile of actual/forecast ratios in validation), not model-based.</li>
+<li><b>Not claimed:</b> causal discount effects, forward-looking CLV, inventory optimisation, returns analysis.</li></ul></div></div></section>
+</main><footer>Source code and tests: github.com/nasaamit005/sales-intelligence-forecasting-customer-profitability</footer>
+<script>
+const D=__DATA__;
+if(Chart.defaults){Chart.defaults.font.family='"Segoe UI",Calibri,Arial,sans-serif';Chart.defaults.plugins.legend.labels.usePointStyle=true}
+const $=s=>document.getElementById(s),MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],PAL=['#2E75B6','#F28E2B','#59A14F','#E15759','#76B7B2','#9C755F'];
+const fmt=n=>n==null||isNaN(n)?'n/a':(n<0?'-':'')+(Math.abs(n)>=1e6?'$'+(Math.abs(n)/1e6).toFixed(2)+'M':Math.abs(n)>=1e3?'$'+(Math.abs(n)/1e3).toFixed(0)+'k':'$'+Math.abs(n).toFixed(0));
+const num=n=>Math.round(n).toLocaleString('en-US'),pct=(n,d=1)=>n==null||isNaN(n)?'n/a':(n*100).toFixed(d)+'%';
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const cls=n=>n<0?'neg':'pos',ch={},st={y:'All',m:'All',c:'All',t:'ov',k:0,mo:null};
+const mk=(id,cfg)=>{if(ch[id])ch[id].destroy();ch[id]=new Chart($(id),cfg)};
+const opts=(f)=>{const t=css('--text'),g=css('--line');const o={responsive:true,maintainAspectRatio:false,animation:false,elements:{bar:{borderRadius:4}},interaction:{mode:'nearest',intersect:false},plugins:{legend:{labels:{color:t,boxWidth:12}},tooltip:{callbacks:{label:c=>{const v=c.chart.options.indexAxis==='y'?c.parsed.x:c.parsed.y;return (c.dataset.label?c.dataset.label+': ':'')+(f==='$'?fmt(v):f==='%'?v+'%':f==='n'?num(v):v)}}}},scales:{x:{ticks:{color:t,maxRotation:60},grid:{color:g}},y:{ticks:{color:t},grid:{color:g}}}};if(f==='$')o.scales.y.ticks.callback=v=>fmt(v);if(f==='%')o.scales.y.ticks.callback=v=>v+'%';if(f==='n')o.scales.y.ticks.callback=v=>num(v);return o};
+const ALL=D.F.reduce((a,r)=>[a[0]+r[5],a[1]+r[6]],[0,0]);
+const rows=(ign,skip)=>D.F.filter(r=>(ign||st.y==='All'||r[0]==st.y)&&(skip==='m'||st.m==='All'||r[2]==st.m)&&(skip==='c'||st.c==='All'||D.SC[r[3]]==st.c));
+const sum=rs=>rs.reduce((a,r)=>[a[0]+r[5],a[1]+r[6],a[2]+r[7],a[3]+r[8]],[0,0,0,0]);
+const MET=[['Revenue',a=>a[0],'$'],['Reported profit',a=>a[1],'$'],['Margin (%)',a=>a[0]?+(a[1]/a[0]*100).toFixed(1):0,'%'],['Units',a=>a[2],'n']];
+const sync=()=>{$('fy').value=st.y;$('fm').value=st.m;$('fc').value=st.c};
+const click=(key,ids)=>({onClick:(e,els)=>{if(els.length){const v=ids[els[0].index];st[key]=st[key]===v?'All':v;sync();render()}},onHover:(e,els)=>{e.native.target.style.cursor=els.length?'pointer':'default'}});
+function yoy(){const ys=[...new Set(D.F.map(r=>r[0]))].sort(),y1=st.y==='All'?ys[ys.length-1]:+st.y,y0=y1-1;if(y0<ys[0])return null;const ro=rows(true);return{y1,y0,a:sum(ro.filter(r=>r[0]===y1)),b:sum(ro.filter(r=>r[0]===y0))}}
+const grp=(rs,kf)=>{const m=new Map();for(const r of rs){const k=kf(r);let a=m.get(k);if(!a){a=[0,0,0,0];m.set(k,a)}a[0]+=r[5];a[1]+=r[6];a[2]+=r[7];a[3]+=r[8]}return m};
+const num2=s=>{const t=String(s).replace(/<[^>]*>/g,'').replace(/[$,%▲▼ ]/g,''),m=t.match(/^(-?[\d.]+)([kM])?$/);return m?parseFloat(m[1])*(m[2]==='M'?1e6:m[2]==='k'?1e3:1):NaN};
+const tbl=(id,h,b,hl)=>{const el=$(id);el.innerHTML='<div class="tools"><button class="btn" data-csv="1">⬇ Download CSV</button></div><table><thead><tr>'+h.map(x=>'<th title="Click to sort">'+x+'</th>').join('')+'</tr></thead><tbody>'+b.map((r,i)=>'<tr'+(hl&&hl(i)?' class="hl"':'')+'>'+r.map((c,j)=>'<td'+(j>0?' class="n"':'')+'>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+el.querySelectorAll('th').forEach((th,i)=>{th.onclick=()=>{const tb=el.querySelector('tbody'),rs=[...tb.rows],asc=th.dataset.a!=='1';th.dataset.a=asc?'1':'0';rs.sort((x,y)=>{const a=x.cells[i].textContent,b2=y.cells[i].textContent,p=num2(a),q=num2(b2);return(isNaN(p)||isNaN(q)?a.localeCompare(b2):p-q)*(asc?1:-1)});rs.forEach(r=>tb.appendChild(r))}});
+el.querySelector('[data-csv]').onclick=()=>{const L=[...el.querySelectorAll('tr')].map(r=>[...r.cells].map(c=>'"'+c.textContent.replace(/"/g,'""')+'"').join(','));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([L.join('\n')],{type:'text/csv'}));a.download=id.replace('t_','')+'.csv';a.click()}};
+const bar=(id,labels,sets,f,extra)=>mk(id,{type:'bar',data:{labels,datasets:sets},options:Object.assign(opts(f),extra||{})});
+function kpis(){const t=sum(rows()),y=yoy(),d=(a,b)=>{if(!y||!b)return'';const x=a/b-1;return'<em class="delta '+(x<0?'neg':'pos')+'">'+(x<0?'▼ ':'▲ ')+Math.abs(x*100).toFixed(1)+'%</em>'},mg=y&&y.a[0]&&y.b[0]?(y.a[1]/y.a[0]-y.b[1]/y.b[0])*100:null,
+dm=mg==null?'':'<em class="delta '+(mg<0?'neg':'pos')+'">'+(mg<0?'▼ ':'▲ ')+Math.abs(mg).toFixed(1)+' pp</em>';
+$('kp').innerHTML=[['Revenue',fmt(t[0]),y?d(y.a[0],y.b[0]):''],['Reported profit',fmt(t[1]),y?d(y.a[1],y.b[1]):''],['Profit margin',pct(t[1]/t[0]),dm],['Units sold',num(t[2]),y?d(y.a[2],y.b[2]):''],['Order lines',num(t[3]),y?d(y.a[3],y.b[3]):''],['Share of all revenue',pct(t[0]/ALL[0]),'']].map(x=>'<div class="kpi"><span>'+x[0]+'</span><b>'+x[1]+x[2]+'</b></div>').join('')}
+function chips(){const L=[];if(st.y!=='All')L.push(['y','Year: '+st.y]);if(st.m!=='All')L.push(['m','Market: '+D.M[st.m]]);if(st.c!=='All')L.push(['c','Category: '+D.C[st.c]]);$('chips').innerHTML=L.length?L.map(x=>'<span class="chip" data-k="'+x[0]+'" title="Remove filter">'+x[1]+' ✕</span>').join(''):'<span class="sub">Showing all data. Use the filters, or click a bar on the Overview charts, to drill down.</span>'}
+function insights(){const rs=rows(),t=sum(rs);if(!rs.length){$('ins').innerHTML='No data for this selection.';return}
+const top=(g,f)=>[...g.entries()].sort((a,b)=>f(b[1])-f(a[1]))[0],m=grp(rs,r=>r[2]),s=grp(rs,r=>r[3]),mo=grp(rs,r=>r[1]),y=yoy(),L=[],tm=top(m,a=>a[0]),ts=top(s,a=>a[1]),bs=top(s,a=>-a[1]),pm=top(mo,a=>a[0]),loss=[...s.values()].filter(a=>a[1]<0).length;
+L.push('<b>'+D.M[tm[0]]+'</b> is the largest market here ('+pct(tm[1][0]/t[0],0)+' of revenue); <b>'+D.S[ts[0]]+'</b> earns the most reported profit ('+fmt(ts[1][1])+').');
+if(bs[1][1]<0)L.push('<b>'+loss+' sub-categor'+(loss>1?'ies lose':'y loses')+' money</b>; the weakest is '+D.S[bs[0]]+' ('+fmt(bs[1][1])+' profit on '+fmt(bs[1][0])+' revenue).');
+L.push('Revenue peaks in <b>'+MN[pm[0]-1]+'</b>.'+(y?' '+y.y1+' revenue is '+(y.a[0]>=y.b[0]?'up ':'down ')+pct(Math.abs(y.a[0]/y.b[0]-1))+' vs '+y.y0+' (arrows on the cards use the same comparison and your filters).':''));
+if(st.t==='di'){const g=grp(rs,r=>r[4]),hi=[4,5].reduce((a,i)=>g.has(i)?[a[0]+g.get(i)[0],a[1]+g.get(i)[1]]:a,[0,0]),z=g.get(0)||[0,0];L.push('Full-price lines earn a <b>'+pct(z[1]/z[0])+'</b> reported margin; lines discounted 31% or more earn <b>'+pct(hi[1]/hi[0])+'</b> and are '+pct(hi[0]/t[0])+' of revenue. This is an association, not proof that discounts cause the loss.')}
+$('ins').innerHTML='<b>What this view says</b><ul>'+L.map(x=>'<li>'+x+'</li>').join('')+'</ul>'}
+function rOv(){const rs=rows(),k=MET[st.k],f=k[2],g=grp(rs,r=>st.y==='All'?r[0]*100+r[1]:r[1]),ks=[...g.keys()].sort((a,b)=>a-b);
+$('h_mon').textContent='Monthly '+k[0].toLowerCase().replace(' (%)','');$('h_cat').textContent=k[0]+' by category (click a bar to filter)';$('h_mkt').textContent=k[0]+' by market (click a bar to filter)';
+const ds=[{label:k[0],data:ks.map(x=>k[1](g.get(x))),borderColor:PAL[0],backgroundColor:PAL[0]+'22',fill:true,pointRadius:0,tension:.25}];if(st.k===0)ds.push({label:'Reported profit',data:ks.map(x=>g.get(x)[1]),borderColor:PAL[1],pointRadius:0,tension:.25});
+mk('c_mon',{type:'line',data:{labels:ks.map(x=>st.y==='All'?Math.floor(x/100)+'-'+String(x%100).padStart(2,'0'):MN[x-1]),datasets:ds},options:opts(f)});
+const c=grp(rows(0,'c'),r=>D.SC[r[3]]),cl=[...c.keys()].sort((a,b)=>k[1](c.get(b))-k[1](c.get(a)));
+bar('c_cat',cl.map(i=>D.C[i]),[{label:k[0],data:cl.map(i=>k[1](c.get(i))),backgroundColor:cl.map(i=>st.c==='All'||st.c===i?PAL[0]:PAL[0]+'44')}],f,click('c',cl));
+const m=grp(rows(0,'m'),r=>r[2]),ml=[...m.keys()].sort((a,b)=>k[1](m.get(b))-k[1](m.get(a))),mc=i=>st.m==='All'||st.m===i?PAL[0]:PAL[0]+'44';
+bar('c_mkt',ml.map(i=>D.M[i]),[{label:k[0],data:ml.map(i=>k[1](m.get(i))),backgroundColor:ml.map(mc)}],f,click('m',ml));
+bar('c_mm',ml.map(i=>D.M[i]),[{label:'Reported margin (%)',data:ml.map(i=>+(m.get(i)[1]/m.get(i)[0]*100).toFixed(1)),backgroundColor:ml.map(i=>m.get(i)[1]<0?PAL[3]:(st.m==='All'||st.m===i?PAL[2]:PAL[2]+'55'))}],'%',click('m',ml));
+$('ctx').innerHTML=[['Orders',num(D.kp.orders)],['Customers',num(D.kp.customers)],['Avg order value','$'+D.kp.aov],['Top 20% customers’ share',pct(D.kp.top20,0)],['Order lines',num(D.kp.rows)],['Total revenue',fmt(ALL[0])]].map(x=>'<div>'+x[0]+'<b>'+x[1]+'</b></div>').join('')}
+function rSa(){const yrs=[...new Set(D.F.map(r=>r[0]))].sort(),rs=rows(),sets=[];yrs.forEach((y,i)=>{const g=grp(rs.filter(r=>r[0]===y),r=>r[1]);if(!g.size)return;const v=MN.map((_,j)=>g.has(j+1)?g.get(j+1)[0]:null),av=v.filter(x=>x!=null),mean=av.reduce((a,b)=>a+b,0)/av.length;sets.push({label:String(y),data:v.map(x=>x==null?null:+(x/mean).toFixed(2)),borderColor:PAL[i],backgroundColor:PAL[i],tension:.25})});
+mk('c_sea',{type:'line',data:{labels:MN,datasets:sets},options:opts()});
+const rs2=D.F.filter(r=>st.c==='All'||D.SC[r[3]]==st.c),g=grp(rs2,r=>r[2]*10000+r[0]),L=D.M.map((n,i)=>{const v=yrs.map(y=>(g.get(i*10000+y)||[0])[0]),p=v[v.length-1],q=v[v.length-2],mg=[0,0];rs2.filter(r=>r[2]===i).forEach(r=>{mg[0]+=r[5];mg[1]+=r[6]});return [n,...v.map(fmt),pct(p/q-1),pct(mg[1]/mg[0])]});
+tbl('t_yoy',['Market',...yrs,'Growth '+yrs[yrs.length-1]+' vs '+yrs[yrs.length-2],'Margin (all years)'],L)}
+function rPr(){const rs=rows(),g=grp(rs,r=>r[3]),k=[...g.keys()].sort((a,b)=>g.get(a)[1]-g.get(b)[1]);
+mk('c_sub',{type:'bar',data:{labels:k.map(i=>D.S[i]),datasets:[{label:'Reported profit',data:k.map(i=>g.get(i)[1]),backgroundColor:k.map(i=>g.get(i)[1]<0?PAL[3]:PAL[2])}]},options:Object.assign(opts('$'),{indexAxis:'y',scales:{x:{ticks:{color:css('--text'),callback:v=>fmt(v)},grid:{color:css('--line')}},y:{ticks:{color:css('--text')},grid:{display:false}}}})});
+tbl('t_sub',['Sub-category','Category','Revenue','Reported profit','Margin','Units'],[...g.keys()].sort((a,b)=>g.get(b)[0]-g.get(a)[0]).map(i=>{const a=g.get(i);return [D.S[i],D.C[D.SC[i]],fmt(a[0]),'<span class="'+cls(a[1])+'">'+fmt(a[1])+'</span>',pct(a[1]/a[0]),num(a[2])]}));
+tbl('t_weak',['Product','Sub-category','Revenue','Margin','Avg discount'],D.weak.map(w=>[w[0],w[1],fmt(w[2]),'<span class="'+cls(w[3])+'">'+pct(w[3])+'</span>',pct(w[4])]));
+const yrs=[...new Set(D.F.map(r=>r[0]))].sort(),y1=st.y==='All'?yrs[yrs.length-1]:+st.y,y0=y1-1,ro=rows(true);
+if(y0<yrs[0]){$('oppn').textContent='Growth needs a prior year: choose a year after '+yrs[0]+' or ‘All’.';if(ch.c_opp){ch.c_opp.destroy();ch.c_opp=null}return}
+const a1=grp(ro.filter(r=>r[0]===y1),r=>r[3]),a0=grp(ro.filter(r=>r[0]===y0),r=>r[3]),P=[...a1.keys()].filter(i=>a0.has(i)&&a0.get(i)[0]>0).map(i=>({n:D.S[i],x:+((a1.get(i)[0]/a0.get(i)[0]-1)*100).toFixed(1),y:+(a1.get(i)[1]/a1.get(i)[0]*100).toFixed(1),r:a1.get(i)[0]}));
+const med=a=>{const s=[...a].sort((x,y)=>x-y),h=s.length>>1;return s.length%2?s[h]:(s[h-1]+s[h])/2},mx=med(P.map(p=>p.x)),my=med(P.map(p=>p.y));
+$('oppn').textContent='Growth = revenue '+y1+' vs '+y0+'. Bubble size = revenue. Quadrants use the medians (growth '+mx.toFixed(1)+'%, margin '+my.toFixed(1)+'%).';
+const Q=[['Invest (growing, high margin)',p=>p.x>=mx&&p.y>=my,PAL[2]],['Fix margin (growing, thin margin)',p=>p.x>=mx&&p.y<my,PAL[1]],['Harvest (slower, high margin)',p=>p.x<mx&&p.y>=my,PAL[0]],['Review (slower, thin margin)',p=>p.x<mx&&p.y<my,PAL[3]]];
+const o=opts();o.scales.x.title={display:true,text:'Revenue growth (%)',color:css('--text')};o.scales.y.title={display:true,text:'Reported margin (%)',color:css('--text')};o.plugins.tooltip={callbacks:{label:c=>c.raw.n+': growth '+c.raw.x+'%, margin '+c.raw.y+'%, revenue '+fmt(c.raw.r)}};
+mk('c_opp',{type:'bubble',data:{datasets:Q.map(q=>({label:q[0],data:P.filter(q[1]).map(p=>({...p,r:Math.max(5,Math.sqrt(p.r)/45)})).map((p,i,a)=>({x:p.x,y:p.y,n:p.n,r:p.r,rv:0})),backgroundColor:q[2]+'AA',borderColor:q[2]}))},options:o});
+ch.c_opp.data.datasets.forEach((d,qi)=>d.data.forEach(p=>{const f=P.find(z=>z.n===p.n);p.rr=p.r;p.r=Math.max(5,Math.sqrt(f.r)/45);p.rev=f.r}));ch.c_opp.options.plugins.tooltip.callbacks.label=c=>c.raw.n+': growth '+c.raw.x+'%, margin '+c.raw.y+'%, revenue '+fmt(c.raw.rev);ch.c_opp.update()}
+function rDi(){const g=grp(rows(),r=>r[4]),k=D.B.map((_,i)=>i).filter(i=>g.has(i)),tot=k.reduce((s,i)=>s+g.get(i)[0],0);
+bar('c_dm',k.map(i=>D.B[i]),[{label:'Reported margin (%)',data:k.map(i=>+(g.get(i)[1]/g.get(i)[0]*100).toFixed(1)),backgroundColor:k.map(i=>g.get(i)[1]<0?PAL[3]:PAL[2])}],'%');
+bar('c_dr',k.map(i=>D.B[i]),[{label:'Revenue',data:k.map(i=>g.get(i)[0]),backgroundColor:PAL[0]},{label:'Reported profit',data:k.map(i=>g.get(i)[1]),backgroundColor:PAL[1]}],'$');
+tbl('t_dis',['Discount band','Order lines','Revenue','Share of revenue','Reported profit','Margin','Loss-making lines (whole dataset)'],k.map(i=>{const a=g.get(i);return [D.B[i],num(a[3]),fmt(a[0]),pct(a[0]/tot),'<span class="'+cls(a[1])+'">'+fmt(a[1])+'</span>','<span class="'+cls(a[1])+'">'+pct(a[1]/a[0])+'</span>',pct(D.loss[i],0)]}))}
+function rCu(){bar('c_seg',D.seg.map(s=>s[0]),[{label:'Revenue share (%)',data:D.seg.map(s=>+(s[4]*100).toFixed(1)),backgroundColor:PAL[0]}],'%');
+tbl('t_seg',['Segment','Customers','Avg recency (days)','Avg orders','Revenue share','Margin'],D.seg.map(s=>[s[0],num(s[1]),s[2],s[3],pct(s[4]),pct(s[5])]));
+const mxc=D.coh.r.length?16:0;$('t_coh').innerHTML='<table><thead><tr><th>Cohort</th><th>Size</th>'+D.coh.r[0].map((_,i)=>'<th>Q+'+i+'</th>').join('')+'</tr></thead><tbody>'+D.coh.r.map((r,i)=>'<tr><td>'+D.coh.q[i]+'</td><td class="n">'+D.coh.n[i]+'</td>'+r.map(v=>v==null?'<td></td>':'<td class="n" style="background:rgba(46,117,182,'+(v*.85).toFixed(2)+');color:'+(v>.55?'#fff':'inherit')+'">'+Math.round(v*100)+'%</td>').join('')+'</tr>').join('')+'</tbody></table>';
+tbl('t_top',['Customer','Segment','Orders','Revenue','Reported profit'],D.top.map(t=>[t[0],t[1],t[2],fmt(t[3]),fmt(t[4])]));
+$('churn').innerHTML=[['Model AUC',D.churn.auc],['Recency-only AUC',D.churn.base],['Train churn rate',pct(D.churn.tr)],['Test churn rate',pct(D.churn.te)]].map(x=>'<div>'+x[0]+'<b>'+x[1]+'</b></div>').join('')}
+function rFc(){const mo=st.mo||D.best;$('fcn').textContent='Selected model: '+D.best+' (lowest mean validation WAPE). The 13-week base case is '+D.pl.ratio+'x the same weeks last year; trailing 52-week growth is '+pct(D.pl.g,0)+'. The shaded band is an approximate empirical 80% interval.';
+const dates=[...D.wk.map(x=>x[0]),...D.fut.map(x=>x[0])],at=(a,i)=>{const m=new Map(a.map(x=>[x[0],x[i]]));return dates.map(d=>m.has(d)?m.get(d):null)},lines=(l,c,x)=>Object.assign({label:l,borderColor:c,pointRadius:0,tension:.2,spanGaps:false},x||{});
+mk('c_fc',{type:'line',data:{labels:dates,datasets:[lines('Actual weekly revenue',PAL[0],{data:at(D.wk,1)}),lines('Held-out test: '+mo,PAL[1],{data:at(D.tpm[mo],1),borderDash:[4,3]}),lines('Forecast: base',PAL[2],{data:at(D.fut,1),pointRadius:2}),lines('High',PAL[2]+'00',{data:at(D.fut,3),fill:'+1',backgroundColor:PAL[2]+'33',borderWidth:0}),lines('Low',PAL[2]+'00',{data:at(D.fut,2),borderWidth:0})]},options:Object.assign(opts('$'),{plugins:{legend:{labels:{color:css('--text'),boxWidth:12,filter:i=>!['High','Low'].includes(i.text)}}}})});
+tbl('t_sel',['Model','Validation WAPE','Validation MAE','Held-out test WAPE','Test MAE'],D.sel.map(s=>[s[0]+(s[0]===D.best?' ✓ selected':''),pct(s[1]),fmt(s[2]),pct(s[3]),fmt(s[4])]),i=>D.sel[i][0]===D.best);
+tbl('t_cat',['Category','Model','Validation WAPE','Test WAPE'],D.cat.filter(c=>c[4]).map(c=>[c[0],c[1],pct(c[2]),pct(c[3])]));
+tbl('t_hz',['Horizon','Revenue low','Revenue base','Revenue high','Units low','Units base','Units high'],D.hz.map(h=>[h[0],fmt(h[1]),fmt(h[2]),fmt(h[3]),num(h[4]),num(h[5]),num(h[6])]))}
+function rIn(){$('finds').innerHTML=D.finds.map(x=>'<li>'+x+'</li>').join('');$('recs').innerHTML=D.recs.map(x=>'<li>'+x+'</li>').join('')}
+const R={ov:rOv,sa:rSa,pr:rPr,di:rDi,cu:rCu,fc:rFc,in:rIn},FT=['ov','sa','pr','di'];
+function render(){const f=FT.includes(st.t);$('filters').style.display=f||st.t==='fc'?'flex':'none';['fy','fm','fc'].forEach(i=>$(i).parentNode.style.display=f?'flex':'none');$('mtl').style.display=st.t==='ov'?'flex':'none';$('reset').style.display=f?'inline-block':'none';$('kp').style.display=f?'grid':'none';$('chips').style.display=f?'flex':'none';$('ins').style.display=f?'block':'none';
+$('mt').innerHTML=MET.map((m,i)=>'<button data-i="'+i+'" class="'+(i===st.k?'on':'')+'">'+m[0].replace(' (%)','')+'</button>').join('');if(f){kpis();chips();insights()}R[st.t]()}
+function show(t){st.t=t;document.querySelectorAll('.sec').forEach(s=>s.classList.toggle('on',s.id==='s_'+t));document.querySelectorAll('#tabs button[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));render();window.scrollTo(0,0)}
+const fill=(id,vals,labs)=>{$(id).innerHTML='<option value="All">All</option>'+vals.map((v,i)=>'<option value="'+v+'">'+(labs?labs[i]:v)+'</option>').join('')};
+fill('fy',[...new Set(D.F.map(r=>r[0]))].sort());fill('fm',D.M.map((_,i)=>i),D.M);fill('fc',D.C.map((_,i)=>i),D.C);
+[['fy','y'],['fm','m'],['fc','c']].forEach(([id,k])=>$(id).addEventListener('change',e=>{st[k]=e.target.value==='All'?'All':+e.target.value;render()}));
+$('reset').addEventListener('click',()=>{st.y=st.m=st.c='All';['fy','fm','fc'].forEach(i=>$(i).value='All');render()});
+document.querySelectorAll('#tabs button[data-t]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.t)));
+$('theme').addEventListener('click',()=>{const d=document.documentElement,dark=d.dataset.theme?d.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;d.dataset.theme=dark?'light':'dark';render()});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',render);
+$('chips').addEventListener('click',e=>{const k=e.target.dataset&&e.target.dataset.k;if(k){st[k]='All';sync();render()}});
+$('mt').addEventListener('click',e=>{const i=e.target.dataset&&e.target.dataset.i;if(i!=null){st.k=+i;render()}});
+$('fmodel').innerHTML=D.sel.map(s=>'<option'+(s[0]===D.best?' selected':'')+'>'+s[0]+'</option>').join('');$('fmodel').addEventListener('change',e=>{st.mo=e.target.value;render()});
+$('reset').addEventListener('click',sync);
+render();
+</script></body></html>
