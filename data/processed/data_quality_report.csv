@@ -1,0 +1,16 @@
+check,passed,detail
+Row ID unique,True,"51,290 rows"
+No rows lost in cleaning,True,"raw=51,290, clean=51,290"
+Dates parsed,True,2011-01-01 to 2014-12-31
+Ship date not before order date,True,ship lag 0-7 days
+Sales > 0,True,min=0.44
+Quantity > 0,True,min=1
+"Discount within [0, 1]",True,max=0.85
+Shipping cost >= 0,True,min=0.00
+No missing keys,True,
+Order ID unique per order (documented exception),False,659 order IDs reused on different dates/customers -> order_key used
+Customer name unique per customer ID (documented exception),False,795 names shared by several IDs -> customer_id used as key
+Product ID unique per product name (documented exception),False,457 product IDs carry several names -> product_key used
+Loss-making line share (informational),True,24.5% of lines have negative reported profit
+Postal code missing (informational),True,80.5% missing; not used in analysis
+Returns / cancellations identifiable,False,no return or cancellation field exists; all lines treated as completed sales

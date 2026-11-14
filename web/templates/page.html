@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ title }} | Sales Intelligence</title><link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+<script src="{{ url_for('static', filename='js/plotly.min.js') }}"></script></head><body><div class="layout">
+<aside><h1>Sales Intelligence<small>Forecasting &amp; Customer Profitability</small></h1>
+{% for key, label in nav %}<a href="{{ url_for('main.page', page=key) }}" class="{{ 'on' if key==page }}">{{ label }}</a>{% endfor %}</aside>
+<main><h2>{{ title }}</h2><div class="sub">Global Superstore sample data (fictional), 2011&ndash;2014. Revenue = sales; profit = source-reported profit.</div>
+{% if filterable %}<form class="filters" method="get">
+{% for key in ['year','market','category','segment'] %}<label>{{ key|title }}<select name="{{ key }}">
+<option>All</option>{% for o in opts[key] %}<option {{ 'selected' if sel[key]|string==o|string }}>{{ o }}</option>{% endfor %}</select></label>{% endfor %}
+<button type="submit">Apply</button><a class="btn" href="{{ url_for('main.page', page=page) }}">Reset</a></form>{% endif %}
+<div class="grid">
+{% for b in blocks %}
+ {% if b.type=='kpis' %}<div class="kpis wide" style="grid-column:1/-1">{% for l,v in b['items'] %}<div class="kpi"><span>{{ l }}</span><b>{{ v }}</b></div>{% endfor %}</div>
+ {% elif b.type=='note' %}<div class="note {{ b.kind if b.kind=='warn' }}">{{ b.text }}</div>
+ {% elif b.type=='chart' %}<div class="card {{ 'wide' if b.wide }}"><div class="plot" data-fig='{{ b.json|e }}'><div class="loading">Loading chart&hellip;</div></div>{% if b.note %}<div class="cnote">{{ b.note }}</div>{% endif %}</div>
+ {% elif b.type=='table' %}<div class="card tcard wide"><h3>{{ b.title }} <a href="{{ url_for('main.export_table', name=b.name) }}{{ '?'+query if b.filters and query }}">Download CSV ({{ b.rows }} rows)</a></h3><div class="scroll">{{ b.html|safe }}</div>{% if b.note %}<div class="cnote">{{ b.note }}</div>{% endif %}</div>
+ {% elif b.type=='downloads' %}<div class="dl wide" style="grid-column:1/-1">{% for k,d,ok in b['items'] %}{% if ok %}<a href="{{ url_for('main.download', key=k) }}">&#11015; {{ d }}</a>{% else %}<a class="off">{{ d }} (not generated yet: run scripts/run_pipeline.py)</a>{% endif %}{% endfor %}</div>
+ {% endif %}
+{% endfor %}</div></main></div>
+<script>document.querySelectorAll('.plot').forEach(function(el){try{var f=JSON.parse(el.dataset.fig);el.innerHTML='';
+Plotly.newPlot(el,f.data,f.layout,{responsive:true,displaylogo:false,toImageButtonOptions:{format:'png',scale:2}});}catch(e){el.innerHTML='<div class="loading">Chart could not be rendered.</div>';}});</script>
+</body></html>

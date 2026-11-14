@@ -1,0 +1,286 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Management Report</title>
+<style>body{font-family:Calibri,Arial,sans-serif;max-width:900px;margin:30px auto;color:#222;line-height:1.45}
+h1{color:#1F3864}h2{color:#1F3864;border-bottom:2px solid #1F3864;padding-bottom:3px;margin-top:28px}
+.kpi{display:flex;gap:12px;flex-wrap:wrap}.k{background:#E8EEF7;padding:10px 14px;border-radius:6px;min-width:130px}
+.k b{display:block;font-size:20px}table.t{border-collapse:collapse;font-size:12px;width:100%}
+table.t th{background:#1F3864;color:#fff;padding:4px 6px;text-align:left}table.t td{padding:3px 6px;border-bottom:1px solid #ddd}
+.note{background:#FFF8E1;border-left:4px solid #F9A825;padding:8px 12px;font-size:13px}</style></head><body>
+<h1>Sales Intelligence: Management Report</h1>
+<p>Generated 11 Nov 2026. Source: Global Superstore sample data (fictional), 01 Jan 2011 to 31 Dec 2014; 51,290 order lines.</p>
+<div class="kpi">
+<div class="k">Revenue<b>$12,642,502</b></div><div class="k">Reported profit<b>$1,467,457</b></div>
+<div class="k">Margin<b>11.6%</b></div><div class="k">Orders<b>25,754</b></div>
+<div class="k">Customers<b>1,590</b></div></div>
+<h2>Key findings</h2><ul><li>Revenue grew every year, from $2.26M in 2011 to $4.30M in 2014; reported margin is 11.6%.</li><li>The top 20% of customers generate 47% of revenue; Champions alone hold 45%.</li><li>Lines discounted by 31% or more are 12% of revenue but run at a -51% reported margin versus 25% at full price (descriptive, not causal).</li><li>178 products with &gt;$5,000 revenue earn under a 2% reported margin and merit pricing review.</li><li>Best forecast model: XGBoost (YoY ratio) (held-out test WAPE 18.0%). Base-case revenue for the next 13 weeks: $886,393 (1.26x the same weeks last year; trailing 52-week growth 26%).</li><li>A logistic churn model reaches AUC 0.79 on a time-split test (recency-only baseline 0.68).</li></ul>
+<h2>Forecast evaluation</h2>
+<p>Selected model: <b>XGBoost (YoY ratio)</b> (lowest mean WAPE across 3 rolling-origin validation folds). Held-out test WAPE for all models:</p>
+<table class="dataframe t">
+  <thead>
+    <tr style="text-align: right;">
+      <th>model</th>
+      <th>MAE</th>
+      <th>RMSE</th>
+      <th>WAPE</th>
+      <th>MAPE</th>
+      <th>Bias</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Naive</td>
+      <td>17,034</td>
+      <td>21,171</td>
+      <td>0.152</td>
+      <td>0.151</td>
+      <td>0.014</td>
+    </tr>
+    <tr>
+      <td>XGBoost (levels)</td>
+      <td>17,051</td>
+      <td>22,643</td>
+      <td>0.152</td>
+      <td>0.142</td>
+      <td>0.107</td>
+    </tr>
+    <tr>
+      <td>Moving average (4w)</td>
+      <td>17,078</td>
+      <td>21,118</td>
+      <td>0.152</td>
+      <td>0.154</td>
+      <td>-0.003</td>
+    </tr>
+    <tr>
+      <td>XGBoost (YoY ratio)</td>
+      <td>20,209</td>
+      <td>25,074</td>
+      <td>0.180</td>
+      <td>0.169</td>
+      <td>0.133</td>
+    </tr>
+    <tr>
+      <td>ARIMA + Fourier</td>
+      <td>20,469</td>
+      <td>25,250</td>
+      <td>0.183</td>
+      <td>0.171</td>
+      <td>0.101</td>
+    </tr>
+    <tr>
+      <td>Seasonal naive + growth</td>
+      <td>21,305</td>
+      <td>27,081</td>
+      <td>0.190</td>
+      <td>0.185</td>
+      <td>0.126</td>
+    </tr>
+    <tr>
+      <td>Seasonal naive</td>
+      <td>32,638</td>
+      <td>37,316</td>
+      <td>0.291</td>
+      <td>0.281</td>
+      <td>0.272</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Discount bands</h2><table class="dataframe t">
+  <thead>
+    <tr style="text-align: right;">
+      <th>discount_band</th>
+      <th>lines</th>
+      <th>revenue</th>
+      <th>profit</th>
+      <th>avg_quantity</th>
+      <th>loss_line_share</th>
+      <th>margin</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0%</td>
+      <td>29009</td>
+      <td>6,992,411</td>
+      <td>1,770,695</td>
+      <td>3.405</td>
+      <td>0.000</td>
+      <td>0.253</td>
+    </tr>
+    <tr>
+      <td>1-10%</td>
+      <td>4679</td>
+      <td>1,962,619</td>
+      <td>338,189</td>
+      <td>3.763</td>
+      <td>0.193</td>
+      <td>0.172</td>
+    </tr>
+    <tr>
+      <td>11-20%</td>
+      <td>6274</td>
+      <td>1,757,261</td>
+      <td>173,255</td>
+      <td>3.729</td>
+      <td>0.233</td>
+      <td>0.099</td>
+    </tr>
+    <tr>
+      <td>21-30%</td>
+      <td>967</td>
+      <td>382,555</td>
+      <td>-21,156</td>
+      <td>3.805</td>
+      <td>0.622</td>
+      <td>-0.055</td>
+    </tr>
+    <tr>
+      <td>31-50%</td>
+      <td>6189</td>
+      <td>1,176,031</td>
+      <td>-380,945</td>
+      <td>3.715</td>
+      <td>0.874</td>
+      <td>-0.324</td>
+    </tr>
+    <tr>
+      <td>&gt;50%</td>
+      <td>4172</td>
+      <td>371,625</td>
+      <td>-412,582</td>
+      <td>2.845</td>
+      <td>1.000</td>
+      <td>-1.110</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Demand scenarios (next 13 weeks)</h2><table class="dataframe t">
+  <thead>
+    <tr style="text-align: right;">
+      <th>horizon</th>
+      <th>revenue_low</th>
+      <th>revenue_base</th>
+      <th>revenue_high</th>
+      <th>units_low</th>
+      <th>units_base</th>
+      <th>units_high</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>~30 days (4 weeks)</td>
+      <td>183,708</td>
+      <td>256,756</td>
+      <td>296,665</td>
+      <td>2,589</td>
+      <td>3,618</td>
+      <td>4,181</td>
+    </tr>
+    <tr>
+      <td>~60 days (9 weeks)</td>
+      <td>424,592</td>
+      <td>593,424</td>
+      <td>685,662</td>
+      <td>5,984</td>
+      <td>8,363</td>
+      <td>9,663</td>
+    </tr>
+    <tr>
+      <td>~90 days (13 weeks)</td>
+      <td>634,210</td>
+      <td>886,393</td>
+      <td>1,024,168</td>
+      <td>8,938</td>
+      <td>12,492</td>
+      <td>14,433</td>
+    </tr>
+  </tbody>
+</table>
+<div class="note"><b>Limitations.</b> Dataset is a fictional sample. Profit is the source's reported field, not audited. No returns,
+inventory, lead-time or cost data exist, so no net-profit, reorder-point or causal discount-effect claims are made.</div>
+<h2>Data quality</h2><table class="dataframe t">
+  <thead>
+    <tr style="text-align: right;">
+      <th>check</th>
+      <th>passed</th>
+      <th>detail</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Row ID unique</td>
+      <td>True</td>
+      <td>51,290 rows</td>
+    </tr>
+    <tr>
+      <td>No rows lost in cleaning</td>
+      <td>True</td>
+      <td>raw=51,290, clean=51,290</td>
+    </tr>
+    <tr>
+      <td>Dates parsed</td>
+      <td>True</td>
+      <td>2011-01-01 to 2014-12-31</td>
+    </tr>
+    <tr>
+      <td>Ship date not before order date</td>
+      <td>True</td>
+      <td>ship lag 0-7 days</td>
+    </tr>
+    <tr>
+      <td>Sales &gt; 0</td>
+      <td>True</td>
+      <td>min=0.44</td>
+    </tr>
+    <tr>
+      <td>Quantity &gt; 0</td>
+      <td>True</td>
+      <td>min=1</td>
+    </tr>
+    <tr>
+      <td>Discount within [0, 1]</td>
+      <td>True</td>
+      <td>max=0.85</td>
+    </tr>
+    <tr>
+      <td>Shipping cost &gt;= 0</td>
+      <td>True</td>
+      <td>min=0.00</td>
+    </tr>
+    <tr>
+      <td>No missing keys</td>
+      <td>True</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Order ID unique per order (documented exception)</td>
+      <td>False</td>
+      <td>659 order IDs reused on different dates/customers -&gt; order_key used</td>
+    </tr>
+    <tr>
+      <td>Customer name unique per customer ID (documented exception)</td>
+      <td>False</td>
+      <td>795 names shared by several IDs -&gt; customer_id used as key</td>
+    </tr>
+    <tr>
+      <td>Product ID unique per product name (documented exception)</td>
+      <td>False</td>
+      <td>457 product IDs carry several names -&gt; product_key used</td>
+    </tr>
+    <tr>
+      <td>Loss-making line share (informational)</td>
+      <td>True</td>
+      <td>24.5% of lines have negative reported profit</td>
+    </tr>
+    <tr>
+      <td>Postal code missing (informational)</td>
+      <td>True</td>
+      <td>80.5% missing; not used in analysis</td>
+    </tr>
+    <tr>
+      <td>Returns / cancellations identifiable</td>
+      <td>False</td>
+      <td>no return or cancellation field exists; all lines treated as completed sales</td>
+    </tr>
+  </tbody>
+</table>
+</body></html>

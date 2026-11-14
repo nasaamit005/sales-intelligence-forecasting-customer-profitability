@@ -1,0 +1,23 @@
+[project]
+name = "salesintel"
+version = "1.0.0"
+description = "Sales intelligence, forecasting and customer profitability platform"
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 175
+src = ["src", "web"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E701", "E702", "E731", "E741"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+
+[tool.ruff.lint.per-file-ignores]
+# long f-string sentences in generated findings / report text
+"src/salesintel/pipeline.py" = ["E501"]
+"src/salesintel/reporting.py" = ["E501"]
+"web/views.py" = ["E501"]

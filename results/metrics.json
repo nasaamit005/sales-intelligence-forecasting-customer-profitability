@@ -1,0 +1,187 @@
+{
+  "rows": 51290,
+  "orders": 25754,
+  "customers": 1590,
+  "revenue": 12642501.909880001,
+  "profit": 1467457.2912800002,
+  "margin": 0.11607332960995605,
+  "date_min": "2011-01-01",
+  "date_max": "2014-12-31",
+  "weeks": 208,
+  "top20_revenue_share": 0.4674805263965432,
+  "revenue_by_year": {
+    "2011": 2259450.89554,
+    "2012": 2677438.6944,
+    "2013": 3405746.44938,
+    "2014": 4299865.87056
+  },
+  "forecast": {
+    "best_model": "XGBoost (YoY ratio)",
+    "split": {
+      "test_start": 195,
+      "val_origins": [
+        156,
+        169,
+        182
+      ]
+    },
+    "selection": {
+      "XGBoost (YoY ratio)": {
+        "MAE": 12082.4154,
+        "RMSE": 15268.9896,
+        "WAPE": 0.1725,
+        "MAPE": 0.1882,
+        "Bias": -0.0708
+      },
+      "XGBoost (levels)": {
+        "MAE": 15438.0098,
+        "RMSE": 18527.8744,
+        "WAPE": 0.2112,
+        "MAPE": 0.212,
+        "Bias": 0.0594
+      },
+      "ARIMA + Fourier": {
+        "MAE": 16514.8789,
+        "RMSE": 18806.3469,
+        "WAPE": 0.2275,
+        "MAPE": 0.244,
+        "Bias": -0.0251
+      },
+      "Seasonal naive + growth": {
+        "MAE": 15654.1556,
+        "RMSE": 18967.4948,
+        "WAPE": 0.2306,
+        "MAPE": 0.2328,
+        "Bias": -0.0225
+      },
+      "Seasonal naive": {
+        "MAE": 16936.021,
+        "RMSE": 20368.5671,
+        "WAPE": 0.2378,
+        "MAPE": 0.2278,
+        "Bias": 0.1695
+      },
+      "Moving average (4w)": {
+        "MAE": 24929.5787,
+        "RMSE": 28790.762,
+        "WAPE": 0.3871,
+        "MAPE": 0.424,
+        "Bias": -0.213
+      },
+      "Naive": {
+        "MAE": 25814.57,
+        "RMSE": 29338.7438,
+        "WAPE": 0.3982,
+        "MAPE": 0.4607,
+        "Bias": -0.3245
+      }
+    },
+    "test": {
+      "Naive": {
+        "MAE": 17033.8863,
+        "RMSE": 21171.27,
+        "WAPE": 0.1519,
+        "MAPE": 0.1507,
+        "Bias": 0.0137
+      },
+      "XGBoost (levels)": {
+        "MAE": 17051.4922,
+        "RMSE": 22642.7589,
+        "WAPE": 0.1521,
+        "MAPE": 0.1417,
+        "Bias": 0.1073
+      },
+      "Moving average (4w)": {
+        "MAE": 17077.8685,
+        "RMSE": 21118.4449,
+        "WAPE": 0.1523,
+        "MAPE": 0.1537,
+        "Bias": -0.003
+      },
+      "XGBoost (YoY ratio)": {
+        "MAE": 20209.0178,
+        "RMSE": 25073.9346,
+        "WAPE": 0.1803,
+        "MAPE": 0.1694,
+        "Bias": 0.1327
+      },
+      "ARIMA + Fourier": {
+        "MAE": 20469.3071,
+        "RMSE": 25249.9699,
+        "WAPE": 0.1826,
+        "MAPE": 0.1714,
+        "Bias": 0.1009
+      },
+      "Seasonal naive + growth": {
+        "MAE": 21304.6173,
+        "RMSE": 27080.747,
+        "WAPE": 0.19,
+        "MAPE": 0.1846,
+        "Bias": 0.126
+      },
+      "Seasonal naive": {
+        "MAE": 32638.188,
+        "RMSE": 37315.7267,
+        "WAPE": 0.2911,
+        "MAPE": 0.2814,
+        "Bias": 0.2717
+      }
+    },
+    "next13_base_revenue": 886392.8469374505,
+    "next13_low": 634209.5323142915,
+    "next13_high": 1024168.0014111005,
+    "plausibility": {
+      "same_weeks_last_year": 703770.5287400001,
+      "forecast_base": 886392.8469374505,
+      "ratio": 1.2594912840758044,
+      "trailing_52w_growth": 0.2612763598466059
+    }
+  },
+  "churn": {
+    "auc_logistic": 0.7927257561062802,
+    "auc_recency_baseline": 0.6798832863852873,
+    "train_customers": 1553,
+    "test_customers": 1588,
+    "train_churn_rate": 0.1957501609787508,
+    "test_churn_rate": 0.13916876574307305
+  },
+  "discount": {
+    "margin_0pct": 0.2532310079973203,
+    "margin_31_plus": -0.5127279108062638,
+    "revenue_share_31_plus": 0.12241691564313872,
+    "loss_line_share_31_plus": 0.9245246597818744
+  },
+  "weak_profit_products": 178,
+  "sql_reconciliation": [
+    {
+      "metric": "revenue",
+      "sql": 12642501.90988,
+      "pandas": 12642501.909880001,
+      "match": true
+    },
+    {
+      "metric": "profit",
+      "sql": 1467457.29128,
+      "pandas": 1467457.2912800002,
+      "match": true
+    },
+    {
+      "metric": "orders",
+      "sql": 25754.0,
+      "pandas": 25754.0,
+      "match": true
+    },
+    {
+      "metric": "units",
+      "sql": 178312.0,
+      "pandas": 178312.0,
+      "match": true
+    },
+    {
+      "metric": "customers",
+      "sql": 1590.0,
+      "pandas": 1590.0,
+      "match": true
+    }
+  ]
+}
