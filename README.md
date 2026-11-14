@@ -159,14 +159,4 @@ Power BI report; automated PDF report; Jupyter notebooks; second/third datasets 
 unreachable from the build environment); BG/NBD CLV; price elasticity; recommender; anomaly detection; MySQL
 (SQLite used; schema is portable).
 
-## 11. Resume bullets (every figure measured above)
 
-**Sales Intelligence, Forecasting & Customer Profitability Platform** | Python, SQL, XGBoost, Flask, Plotly, Excel
-* Built an end-to-end analytics platform on 51,290 order lines: validated ingestion, a SQLite star schema reconciled
-  to pandas, KPI/RFM/cohort analytics, automated 17-tab Excel reporting, and a 9-page Flask + Plotly dashboard.
-* Compared 7 forecasting models with rolling-origin validation and a held-out test block; the selected XGBoost
-  YoY-ratio model reached 17.2% validation WAPE; detected and fixed a forecast overshoot (1.70x vs. last year) with a
-  plausibility check and regression test.
-* Built a time-split churn model (AUC 0.79 vs. 0.68 baseline) and quantified that lines discounted 31%+ (12% of
-  revenue) ran at a -51% reported margin, flagged as descriptive, not causal.
-* 51 automated tests (~99% coverage) incl. leakage and reconciliation checks.
