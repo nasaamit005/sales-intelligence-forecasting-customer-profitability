@@ -1,5 +1,6 @@
 # Sales Intelligence, Forecasting & Customer Profitability Optimization Platform
-**Live interactive dashboard: [nasaamit005.github.io/sales-intelligence-forecasting-customer-profitability](https://nasaamit005.github.io/sales-intelligence-forecasting-customer-profitability/)**
+
+**▶ Live interactive dashboard: [nasaamit005.github.io/sales-intelligence-forecasting-customer-profitability](https://nasaamit005.github.io/sales-intelligence-forecasting-customer-profitability/)**
 
 An end-to-end business analytics application: **data -> SQL -> analytics -> machine learning -> business
 recommendations -> interactive dashboard -> automated reporting**, built on the Global Superstore sample
@@ -24,9 +25,10 @@ dataset (51,290 order lines, 2011-2014, 7 markets, 147 countries).
 
 ```bash
 pip install -r requirements.txt
-python scripts/run_pipeline.py      # ~15 s: cleans data, builds SQLite DB, models, Excel + HTML reports
-python app.py                       # dashboard at http://127.0.0.1:5000
-pytest                              # 51 tests, ~99% line coverage
+python scripts/run_pipeline.py                        # ~15 s: cleans data, builds SQLite DB, models, Excel + HTML reports
+python app.py                                         # Flask dashboard at http://127.0.0.1:5000
+python scripts/build_static_dashboard.py index.html   # rebuilds the static dashboard served by GitHub Pages
+pytest                                                # 51 tests, ~99% line coverage
 ```
 
 ## 3. Architecture
@@ -39,6 +41,7 @@ data/raw  (read-only)  ->  src/salesintel/data.py        clean + validate  -> da
                        ->  commercial.py                  discount bands, opportunity matrix, demand scenarios
                        ->  reporting.py                   17-tab Excel workbook + HTML management report
 web/ (Flask + Plotly, light theme, 9 pages, filters, CSV export)      scripts/run_pipeline.py  tests/
+index.html (static Chart.js dashboard, built by scripts/build_static_dashboard.py, hosted on GitHub Pages)
 ```
 
 Star schema: `fact_sales`, `dim_date`, `dim_customer`, `dim_product`, `dim_region`, plus `fact_forecast`
@@ -121,50 +124,26 @@ should be read as indicative. The change was driven by the plausibility check, a
 test-block score of the selected model (12.3% -> 18.0%). ARIMA + Fourier still overshoots Q1 (1.5x); it is kept in
 the comparison for transparency, and it is not selected.
 
-## 6. Dashboard
+## 6. Interactive dashboards
 
-Nine pages (Executive Overview, Sales, Product, Regional, Customer, Forecasting, Pricing & Discounts, Demand
-Planning, Reports). Year / market / category / segment filters update every chart and KPI on the filterable pages;
-every table has a filtered CSV export; Plotly charts export PNG; empty-filter and missing-report states are handled.
-Charts are served from a local `plotly.min.js` (no CDN needed). Screenshots: `docs/screenshots/`.
-The forecasting page is not filterable (forecasts are at total level).
-**Two versions of the dashboard:**
-- **Live static version** (`index.html`, hosted on GitHub Pages): 7 tabs, with Year / Market / Category filters. It is rebuilt from the pipeline results by `scripts/build_static_dashboard.py` and loads Chart.js from a CDN, so it needs an internet connection.
-- **Flask version** (`python app.py`): 9 pages, with CSV export and a local Plotly bundle, so it works offline.
+**▶ Live demo: https://nasaamit005.github.io/sales-intelligence-forecasting-customer-profitability/**
+(opens in any browser, no installation; an internet connection is needed to load the chart library)
 
-## 7. Reports
+The project ships two front ends over the **same pipeline results**, so the numbers match everywhere.
 
-* `reports/excel/sales_intelligence_report.xlsx`: 17 tabs (Executive Dashboard with native chart, KPIs, trends,
-  products, categories, regions, RFM, cohorts, historical customer value, forecast comparison/accuracy, discounts,
-  demand planning, data quality, data dictionary, catalog). Totals are verified against the pipeline in tests.
-* `reports/html/management_report.html`: findings, forecast evaluation, limitations (print to PDF in a browser).
-  **A PDF generator and a Power BI report were not built** (see the roadmap in section 10).
+| | Live static dashboard | Flask application |
+|---|---|---|
+| Run it | GitHub Pages (`index.html`) | `python app.py` then open http://127.0.0.1:5000 |
+| Layout | 7 tabs | 9 pages |
+| Filters | Year, Market, Category | Year, Market, Category, Segment |
+| Exports | none | Filtered CSV for each table, PNG for each chart, Excel and HTML report downloads |
+| Charts | Chart.js (loaded from a CDN) | Plotly (bundled locally, works offline) |
+| Theme | Light and dark, with a toggle | Light |
+| Best for | Sharing and portfolio review | Local exploration and downloading reports |
 
-## 8. Testing
+### Live static dashboard: 7 tabs
 
-`pytest`: 51 tests, ~99% line coverage. They cover raw-file immutability, mixed-date parsing, SQL-vs-pandas
-reconciliation, foreign keys, RFM reconciliation against raw transactions, feature leakage (lag, YoY and churn
-features cannot see the future), chronological splits, selection independent of the test block, forecast
-plausibility, Excel/HTML contents, and every dashboard route and filter. `ruff` passes.
-
-## 9. Analytical limits (what this data cannot establish)
-
-* **No causal discount claims**: observational data only.
-* **No true profit**: profit is the reported field; shipping cost is shown separately and not subtracted.
-* **No CLV forecast**: only historical value; the churn model predicts lapse, not value.
-* **No inventory optimisation**: no stock/lead-time data, so Demand Planning gives unit-demand *scenarios*
-  (units inferred from the trailing-52-week units-per-dollar ratio), not reorder points.
-* Forecasts are total-level, trained on 4 years of weekly data; yearly seasonality rests on 3-4 cycles.
-* Returns and cancellations cannot be identified.
-
-## 10. Roadmap 
-
-| Planned extension | Why it is not here yet |
+| Tab | What it shows |
 |---|---|
-| Power BI report | A second BI deliverable; the Excel workbook and dashboards cover reporting for now |
-| Automated PDF report | The HTML management report can be printed to PDF from a browser |
-| Jupyter notebooks (EDA, forecasting experiments) | The logic lives in tested modules under `src/` |
-| Additional datasets (UCI Online Retail II, Olist) | This version uses one dataset; they would add customer-forecast and delivery/seller analytics |
-| Forward-looking CLV (BG/NBD + Gamma-Gamma) | Needs assumptions the current data does not support; only historical value is reported |
-| Price elasticity, promotion uplift, recommender, anomaly detection | Beyond the validated core; discounts here are observational |
-| MySQL / PostgreSQL | SQLite is used; the schema in `database/schema.sql` is portable |
+| Overview | KPI cards, monthly revenue and reported profit, category and market breakdowns, margin by market |
+| Sales & Seasonality | Monthly seasonality index by year; market-by-year
