@@ -128,6 +128,9 @@ Planning, Reports). Year / market / category / segment filters update every char
 every table has a filtered CSV export; Plotly charts export PNG; empty-filter and missing-report states are handled.
 Charts are served from a local `plotly.min.js` (no CDN needed). Screenshots: `docs/screenshots/`.
 The forecasting page is not filterable (forecasts are at total level).
+**Two versions of the dashboard:**
+- **Live static version** (`docs/index.html`, hosted on GitHub Pages): 7 tabs, with Year / Market / Category filters. It is rebuilt from the pipeline results by `scripts/build_static_dashboard.py` and loads Chart.js from a CDN, so it needs an internet connection.
+- **Flask version** (`python app.py`): 9 pages, with CSV export and a local Plotly bundle, so it works offline.
 
 ## 7. Reports
 
@@ -135,7 +138,7 @@ The forecasting page is not filterable (forecasts are at total level).
   products, categories, regions, RFM, cohorts, historical customer value, forecast comparison/accuracy, discounts,
   demand planning, data quality, data dictionary, catalog). Totals are verified against the pipeline in tests.
 * `reports/html/management_report.html`: findings, forecast evaluation, limitations (print to PDF in a browser).
-  **A PDF generator and a Power BI report were not built** (see section 10).
+  **A PDF generator and a Power BI report were not built** (see the roadmap in section 10).
 
 ## 8. Testing
 
@@ -154,10 +157,14 @@ plausibility, Excel/HTML contents, and every dashboard route and filter. `ruff` 
 * Forecasts are total-level, trained on 4 years of weekly data; yearly seasonality rests on 3-4 cycles.
 * Returns and cancellations cannot be identified.
 
-## 10. Not done (deliberately not claimed)
+## 10. Roadmap 
 
-Power BI report; automated PDF report; Jupyter notebooks; second/third datasets (UCI Online Retail II, Olist,
-unreachable from the build environment); BG/NBD CLV; price elasticity; recommender; anomaly detection; MySQL
-(SQLite used; schema is portable).
-
-
+| Planned extension | Why it is not here yet |
+|---|---|
+| Power BI report | A second BI deliverable; the Excel workbook and dashboards cover reporting for now |
+| Automated PDF report | The HTML management report can be printed to PDF from a browser |
+| Jupyter notebooks (EDA, forecasting experiments) | The logic lives in tested modules under `src/` |
+| Additional datasets (UCI Online Retail II, Olist) | This version uses one dataset; they would add customer-forecast and delivery/seller analytics |
+| Forward-looking CLV (BG/NBD + Gamma-Gamma) | Needs assumptions the current data does not support; only historical value is reported |
+| Price elasticity, promotion uplift, recommender, anomaly detection | Beyond the validated core; discounts here are observational |
+| MySQL / PostgreSQL | SQLite is used; the schema in `database/schema.sql` is portable |
